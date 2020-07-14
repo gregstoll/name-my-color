@@ -13,24 +13,24 @@ interface FriendlyColor {
 
 type AppState = {
   isFetching: boolean,
-  xkcd: FriendlyColor[]
+  colorData: Map<string, FriendlyColor[]>,
 };
 
 class App extends React.Component<{}, AppState> {
   state: AppState = {
     isFetching: false,
-    xkcd: []
+    colorData: new Map<string, FriendlyColor[]>()
   };
 
   render() {
     let white = lab('#00aba5');
     let black = lab('#000000');
-    if (this.state.isFetching) {
+    if (this.state.isFetching || this.state.colorData.size === 0) {
       return <h1>Fetching</h1>;
     }
     // TODO kinda ugly
     let distances : Array<[number, FriendlyColor]> = [];
-    for (const friendlyColor of this.state.xkcd) {
+    for (const friendlyColor of this.state.colorData.get("xkcd")!) {
       distances.push([colorDistance(white, friendlyColor.labColor), friendlyColor]);
     }
     distances.sort((a, b) => a[0] - b[0]);
@@ -56,10 +56,12 @@ class App extends React.Component<{}, AppState> {
     try {
       this.setState({...this.state, isFetching: true});
       //TODO do these in parallel with Promise.all
-      const response = await fetch ("xkcdrgb.txt");
-      const data = await response.text();
+      let fileContents = await Promise.all([this.fetchColorFile("xkcdrgb.txt"), this.fetchColorFile("cssrgb.txt")]);
+      let colorData = new Map<string, FriendlyColor[]>();
+      colorData.set("xkcd", this.parseData(fileContents[0]));
+      colorData.set("css", this.parseData(fileContents[1]));
       this.setState({...this.state,
-        xkcd: this.parseData(data),
+        colorData: colorData,
         isFetching: false
       });
     }
@@ -67,6 +69,12 @@ class App extends React.Component<{}, AppState> {
       console.log(e);
       this.setState({...this.state, isFetching: false});
     }
+  }
+
+  async fetchColorFile(fileName: string) : Promise<string> {
+    const response = await fetch (fileName);
+    const data = await response.text();
+    return data;
   }
 
   parseData(str: string) : FriendlyColor[] {
