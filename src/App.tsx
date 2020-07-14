@@ -29,15 +29,12 @@ class App extends React.Component<{}, AppState> {
       return <h1>Fetching</h1>;
     }
     // TODO kinda ugly
-    let distances : Array<[number, FriendlyColor]> = [];
-    for (const friendlyColor of this.state.colorData.get("xkcd")!) {
-      distances.push([colorDistance(white, friendlyColor.labColor), friendlyColor]);
-    }
-    distances.sort((a, b) => a[0] - b[0]);
     let parts : JSX.Element[] = [];
-    for (const distance of distances) {
-      parts.push(<li key={distance[1].name}><span className="colorBox" style={{backgroundColor: distance[1].cssColor}}></span>
-       {distance[1].name}: {distance[0]} </li>);
+    for (let part of this.getMostSimilarColors(this.state.colorData.get("xkcd")!, white, "Xkcd")) {
+      parts.push(part);
+    }
+    for (let part of this.getMostSimilarColors(this.state.colorData.get("css")!, white, "Css")) {
+      parts.push(part);
     }
     return (
       <div className="App">
@@ -46,6 +43,21 @@ class App extends React.Component<{}, AppState> {
         </ul>
       </div>
     );
+  }
+
+  getMostSimilarColors(colors: FriendlyColor[], targetColor: LabColor, label: string) : JSX.Element[] {
+    let distances : Array<[number, FriendlyColor]> = [];
+    for (const friendlyColor of colors) {
+      distances.push([colorDistance(targetColor, friendlyColor.labColor), friendlyColor]);
+    }
+    distances.sort((a, b) => a[0] - b[0]);
+    let parts : JSX.Element[] = [];
+    parts.push(<h1>{label}</h1>);
+    for (const distance of distances.slice(0, 10)) {
+      parts.push(<li key={label + "|" + distance[1].name}><span className="colorBox" style={{backgroundColor: distance[1].cssColor}}></span>
+       {distance[1].name}: {distance[0]} </li>);
+    }
+    return parts;
   }
 
   componentDidMount() {
