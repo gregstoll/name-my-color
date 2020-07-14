@@ -53,8 +53,10 @@ class App extends React.Component<{}, AppState> {
     distances.sort((a, b) => a[0] - b[0]);
     let parts : JSX.Element[] = [];
     parts.push(<h1>{label}</h1>);
+    // TODO - constant for 10 here
     for (const distance of distances.slice(0, 10)) {
-      parts.push(<li key={label + "|" + distance[1].name}><span className="colorBox" style={{backgroundColor: distance[1].cssColor}}></span>
+      // TODO - show distance only up to 2 digits after decimal point or whatever
+      parts.push(<li key={label + "|" + distance[1].name}><span className="colorBox" title={distance[1].cssColor} style={{backgroundColor: distance[1].cssColor}}></span>
        {distance[1].name}: {distance[0]} </li>);
     }
     return parts;
