@@ -39,7 +39,7 @@ class App extends React.Component<{}, AppState> {
     return (
       <div className="App">
         <div>
-          <span className="colorBox" title="#00aba5" style={{backgroundColor: "#00aba5"}}></span>##00aba5
+          <span className="colorBox" title="#00aba5" style={{backgroundColor: "#00aba5"}}></span>#00aba5
         </div>
         <ul>
           {parts}
@@ -60,10 +60,11 @@ class App extends React.Component<{}, AppState> {
     for (const distance of distances.slice(0, 10)) {
       // TODO - show distance only up to 2 digits after decimal point or whatever
       parts.push(<li key={label + "|" + distance[1].name}><span className="colorBox" title={distance[1].cssColor} style={{backgroundColor: distance[1].cssColor}}></span>
-       {distance[1].name}: {distance[0]} </li>);
+       {distance[1].name}: {getDisplayDistance(distance[0])} </li>);
     }
     return parts;
   }
+
 
   componentDidMount() {
     this.fetchColors();
@@ -111,6 +112,10 @@ class App extends React.Component<{}, AppState> {
   }
 
   fetchColors = this.fetchColorsAsync;
+}
+
+export function getDisplayDistance(distance: number) : string {
+  return (Math.round(distance * 100) / 100).toFixed(2);
 }
 
 export function colorDistance(x: LabColor, y: LabColor): number {
