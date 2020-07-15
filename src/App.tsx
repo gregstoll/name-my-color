@@ -38,6 +38,9 @@ class App extends React.Component<{}, AppState> {
     }
     return (
       <div className="App">
+        <div>
+          <span className="colorBox" title="#00aba5" style={{backgroundColor: "#00aba5"}}></span>##00aba5
+        </div>
         <ul>
           {parts}
         </ul>
