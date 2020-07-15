@@ -58,7 +58,6 @@ class App extends React.Component<{}, AppState> {
     parts.push(<h1>{label}</h1>);
     // TODO - constant for 10 here
     for (const distance of distances.slice(0, 10)) {
-      // TODO - show distance only up to 2 digits after decimal point or whatever
       parts.push(<li key={label + "|" + distance[1].name}><span className="colorBox" title={distance[1].cssColor} style={{backgroundColor: distance[1].cssColor}}></span>
        {distance[1].name}: {getDisplayDistance(distance[0])} </li>);
     }
