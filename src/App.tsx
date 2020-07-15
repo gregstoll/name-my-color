@@ -110,7 +110,7 @@ class App extends React.Component<{}, AppState> {
   fetchColors = this.fetchColorsAsync;
 }
 
-export function colorDistance(x: LabColor, y: LabColor) {
+export function colorDistance(x: LabColor, y: LabColor): number {
   const lab1 = new colorlab.CIELAB(x.l, x.a, x.b);
   const lab2 = new colorlab.CIELAB(y.l, y.a, x.b);
   return colorlab.CIEDE2000(lab1, lab2);
