@@ -3,7 +3,7 @@ import colorlab from 'colorlab';
 import { lab, LabColor } from 'd3-color';
 import './App.css';
 
-const COLOR_SETS = ["xkcd"];
+const COLOR_SETS = ["xkcd", "css"];
 
 interface FriendlyColor {
   name: string,
@@ -30,12 +30,11 @@ class App extends React.Component<{}, AppState> {
     }
     // TODO kinda ugly
     let parts : JSX.Element[] = [];
-    for (let part of this.getMostSimilarColors(this.state.colorData.get("xkcd")!, white, "Xkcd")) {
-      parts.push(part);
-    }
-    for (let part of this.getMostSimilarColors(this.state.colorData.get("css")!, white, "Css")) {
-      parts.push(part);
-    }
+    COLOR_SETS.map(name => {
+      for (let part of this.getMostSimilarColors(this.state.colorData.get(name)!, white, name)) {
+        parts.push(part);
+      }
+    });
     return (
       <div className="App">
         <div>
@@ -72,10 +71,12 @@ class App extends React.Component<{}, AppState> {
     try {
       this.setState({...this.state, isFetching: true});
       //TODO do these in parallel with Promise.all
-      let fileContents = await Promise.all([this.fetchColorFile("xkcdrgb.txt"), this.fetchColorFile("cssrgb.txt")]);
+      const fetchPromises = COLOR_SETS.map(title => this.fetchColorFile(title + "rgb.txt"));
+      const fileContents = await Promise.all(fetchPromises);
       let colorData = new Map<string, FriendlyColor[]>();
-      colorData.set("xkcd", this.parseData(fileContents[0]));
-      colorData.set("css", this.parseData(fileContents[1]));
+      fileContents.map((contents, index) => {
+        colorData.set(COLOR_SETS[index], this.parseData(contents));
+      });
       this.setState({...this.state,
         colorData: colorData,
         isFetching: false
