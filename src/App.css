@@ -4,6 +4,17 @@ span.colorBox {
   height: 20px;
 }
 
+div.colorSet {
+  border-color: gray;
+  border-radius: 10px;
+  border-width: 3px;
+  border-style: solid;
+  padding: 5px;
+  list-style: none;
+  width: 400px;
+  float: left;
+}
+
 /*.App {
   text-align: center;
 }

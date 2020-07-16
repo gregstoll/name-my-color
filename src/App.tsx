@@ -31,9 +31,7 @@ class App extends React.Component<{}, AppState> {
     // TODO kinda ugly
     let parts : JSX.Element[] = [];
     COLOR_SETS.map(name => {
-      for (let part of this.getMostSimilarColors(this.state.colorData.get(name)!, white, name)) {
-        parts.push(part);
-      }
+      parts.push(this.getSimilarColorElement(this.state.colorData.get(name)!, white, name));
     });
     return (
       <div className="App">
@@ -47,20 +45,23 @@ class App extends React.Component<{}, AppState> {
     );
   }
 
-  getMostSimilarColors(colors: FriendlyColor[], targetColor: LabColor, label: string) : JSX.Element[] {
-    let distances : Array<[number, FriendlyColor]> = [];
-    for (const friendlyColor of colors) {
-      distances.push([colorDistance(targetColor, friendlyColor.labColor), friendlyColor]);
-    }
-    distances.sort((a, b) => a[0] - b[0]);
+  getSimilarColorElement(colors: FriendlyColor[], targetColor: LabColor, label: string) : JSX.Element {
     let parts : JSX.Element[] = [];
     parts.push(<h1>{label}</h1>);
-    // TODO - constant for 10 here
-    for (const distance of distances.slice(0, 10)) {
-      parts.push(<li key={label + "|" + distance[1].name}><span className="colorBox" title={distance[1].cssColor} style={{backgroundColor: distance[1].cssColor}}></span>
-       {distance[1].name}: {getDisplayDistance(distance[0])} </li>);
+    const similarColors = this.getMostSimilarColors(colors, targetColor);
+    for (const similarColor of similarColors.slice(0, 10)) {
+      parts.push(<li key={label + "|" + similarColor[1].name}><span className="colorBox" title={similarColor[1].cssColor} style={{backgroundColor: similarColor[1].cssColor}}></span>
+       &nbsp;{similarColor[1].name}: {getDisplayDistance(similarColor[0])} </li>);
     }
-    return parts;
+    return <div className="colorSet">{parts}</div>
+  }
+
+  getMostSimilarColors(colors: FriendlyColor[], targetColor: LabColor) : Array<[number, FriendlyColor]> {
+    let distances : Array<[number, FriendlyColor]> =
+      colors.map(friendlyColor => [colorDistance(targetColor, friendlyColor.labColor), friendlyColor]);
+    distances.sort((a, b) => a[0] - b[0]);
+    // TODO - constant for 10 here
+    return distances.slice(0, 10);
   }
 
   componentWillMount() {
