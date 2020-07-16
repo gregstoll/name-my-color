@@ -116,7 +116,7 @@ export function getDisplayDistance(distance: number) : string {
 
 export function colorDistance(x: LabColor, y: LabColor): number {
   const lab1 = new colorlab.CIELAB(x.l, x.a, x.b);
-  const lab2 = new colorlab.CIELAB(y.l, y.a, x.b);
+  const lab2 = new colorlab.CIELAB(y.l, y.a, y.b);
   return colorlab.CIEDE2000(lab1, lab2);
 }
 
