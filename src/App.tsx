@@ -46,7 +46,7 @@ class App extends React.Component<{}, AppState> {
     let parts : JSX.Element[] = [];
     parts.push(<h1>{label}</h1>);
     const similarColors = this.getMostSimilarColors(colors, targetColor);
-    for (const similarColor of similarColors.slice(0, 10)) {
+    for (const similarColor of similarColors) {
       parts.push(<li key={label + "|" + similarColor[1].name}><span className="colorBox" title={similarColor[1].cssColor} style={{backgroundColor: similarColor[1].cssColor}}></span>
        &nbsp;{similarColor[1].name}: {getDisplayDistance(similarColor[0])} </li>);
     }
