@@ -15,6 +15,10 @@ div.colorSet {
   float: left;
 }
 
+.App {
+  padding: 10px;
+}
+
 /*.App {
   text-align: center;
 }

@@ -24,7 +24,6 @@ class App extends React.Component<{}, AppState> {
 
   render() {
     let white = lab('#00aba5');
-    let black = lab('#000000');
     if (this.state.isFetching || this.state.colorData.size === 0) {
       return <h1>Fetching data...</h1>;
     }
@@ -38,9 +37,7 @@ class App extends React.Component<{}, AppState> {
         <div>
           <span className="colorBox" title="#00aba5" style={{backgroundColor: "#00aba5"}}></span>#00aba5
         </div>
-        <ul>
-          {parts}
-        </ul>
+        {parts}
       </div>
     );
   }
@@ -71,7 +68,6 @@ class App extends React.Component<{}, AppState> {
   async fetchColorsAsync() {
     try {
       this.setState({...this.state, isFetching: true});
-      //TODO do these in parallel with Promise.all
       const fetchPromises = COLOR_SETS.map(title => this.fetchColorFile(title + "rgb.txt"));
       const fileContents = await Promise.all(fetchPromises);
       let colorData = new Map<string, FriendlyColor[]>();
