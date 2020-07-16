@@ -26,7 +26,7 @@ class App extends React.Component<{}, AppState> {
     let white = lab('#00aba5');
     let black = lab('#000000');
     if (this.state.isFetching || this.state.colorData.size === 0) {
-      return <h1>Fetching</h1>;
+      return <h1>Fetching data...</h1>;
     }
     // TODO kinda ugly
     let parts : JSX.Element[] = [];
@@ -64,8 +64,7 @@ class App extends React.Component<{}, AppState> {
     return parts;
   }
 
-
-  componentDidMount() {
+  componentWillMount() {
     this.fetchColors();
   }
 
