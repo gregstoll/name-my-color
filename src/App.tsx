@@ -107,7 +107,8 @@ class App extends React.Component<{}, AppState> {
 
 type SimilarColorsProps = {
   colorData: Map<string, FriendlyColor[]>,
-  targetColor: string
+  targetColor: string,
+  numberOfSimilarColors?: number
 };
 
 
@@ -141,8 +142,7 @@ class SimilarColors extends React.Component<SimilarColorsProps> {
     let distances : Array<[number, FriendlyColor]> =
       colors.map(friendlyColor => [colorDistance(targetColor, friendlyColor.labColor), friendlyColor]);
     distances.sort((a, b) => a[0] - b[0]);
-    // TODO - constant for 25 here
-    return distances.slice(0, 25);
+    return distances.slice(0, this.props.numberOfSimilarColors ?? 25);
   }
 }
 
