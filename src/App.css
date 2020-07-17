@@ -10,9 +10,17 @@ div.colorSet {
   border-width: 3px;
   border-style: solid;
   padding: 5px;
+  margin: 5px;
   list-style: none;
   width: 400px;
   float: left;
+}
+
+li.colorLine {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .App {
