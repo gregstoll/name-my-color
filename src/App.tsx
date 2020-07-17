@@ -3,7 +3,24 @@ import colorlab from 'colorlab';
 import { lab, LabColor } from 'd3-color';
 import './App.css';
 
-const COLOR_SETS = ["xkcd", "css"];
+const COLOR_SETS: ColorSet[] = [
+  {
+    filename: "xkcd",
+    title: "Xkcd",
+    description: "Xkcd description <a href=\"https://xkcd.com\">link</a>"
+  },
+  {
+    filename: "css",
+    title: "Css",
+    description: "Css description <a href=\"https://xkcd.com\">link</a>"
+  }
+];
+
+interface ColorSet {
+  filename: string,
+  title: string,
+  description: string
+};
 
 interface FriendlyColor {
   name: string,
@@ -29,8 +46,8 @@ class App extends React.Component<{}, AppState> {
     }
     // TODO kinda ugly
     let parts : JSX.Element[] = [];
-    COLOR_SETS.map(name => {
-      parts.push(this.getSimilarColorElement(this.state.colorData.get(name)!, white, name));
+    COLOR_SETS.map(colorSet => {
+      parts.push(this.getSimilarColorElement(this.state.colorData.get(colorSet.filename)!, white, colorSet));
     });
     return (
       <div className="App">
@@ -42,12 +59,14 @@ class App extends React.Component<{}, AppState> {
     );
   }
 
-  getSimilarColorElement(colors: FriendlyColor[], targetColor: LabColor, label: string) : JSX.Element {
+  getSimilarColorElement(colors: FriendlyColor[], targetColor: LabColor, colorSet: ColorSet) : JSX.Element {
     let parts : JSX.Element[] = [];
-    parts.push(<h1>{label}</h1>);
+    parts.push(<h1>{colorSet.title}</h1>);
+    const unsafeDescription = {__html: colorSet.description};
+    parts.push(<p dangerouslySetInnerHTML={unsafeDescription}></p>);
     const similarColors = this.getMostSimilarColors(colors, targetColor);
     for (const similarColor of similarColors) {
-      parts.push(<li key={label + "|" + similarColor[1].name} className="colorLine">
+      parts.push(<li key={colorSet.filename + "|" + similarColor[1].name} className="colorLine">
         <span className="colorBox" title={similarColor[1].cssColor} style={{backgroundColor: similarColor[1].cssColor}}></span>
         <span>&nbsp;{similarColor[1].name}: {getDisplayDistance(similarColor[0])}</span>
        </li>);
@@ -70,11 +89,11 @@ class App extends React.Component<{}, AppState> {
   async fetchColorsAsync() {
     try {
       this.setState({...this.state, isFetching: true});
-      const fetchPromises = COLOR_SETS.map(title => this.fetchColorFile(title + "rgb.txt"));
+      const fetchPromises = COLOR_SETS.map(colorSet => this.fetchColorFile(colorSet.filename + "rgb.txt"));
       const fileContents = await Promise.all(fetchPromises);
       let colorData = new Map<string, FriendlyColor[]>();
       fileContents.map((contents, index) => {
-        colorData.set(COLOR_SETS[index], this.parseData(contents));
+        colorData.set(COLOR_SETS[index].filename, this.parseData(contents));
       });
       this.setState({...this.state,
         colorData: colorData,
