@@ -7,12 +7,12 @@ const COLOR_SETS: ColorSet[] = [
   {
     filename: "xkcd",
     title: "Xkcd",
-    description: "Xkcd description <a href=\"https://xkcd.com\">link</a>"
+    description: "The popular <a href=\"https://xkcd.com\">xkcd</a> webcomic did a project to crowdsource common color names; you can see the results <a href=\"https://xkcd.com/color/rgb/\">here</a>."
   },
   {
     filename: "css",
     title: "Css",
-    description: "Css description <a href=\"https://xkcd.com\">link</a>"
+    description: "The named colors defined in the CSS4 spec, available <a href=\"https://www.w3.org/TR/css-color-4/#hex-notation\">here</a>."
   }
 ];
 
@@ -63,7 +63,7 @@ class App extends React.Component<{}, AppState> {
     let parts : JSX.Element[] = [];
     parts.push(<h1>{colorSet.title}</h1>);
     const unsafeDescription = {__html: colorSet.description};
-    parts.push(<p dangerouslySetInnerHTML={unsafeDescription}></p>);
+    parts.push(<p className="colorSetDescription" dangerouslySetInnerHTML={unsafeDescription}></p>);
     const similarColors = this.getMostSimilarColors(colors, targetColor);
     for (const similarColor of similarColors) {
       parts.push(<li key={colorSet.filename + "|" + similarColor[1].name} className="colorLine">

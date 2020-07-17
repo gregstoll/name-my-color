@@ -23,6 +23,11 @@ li.colorLine {
   margin-bottom: 5px;
 }
 
+.colorSetDescription {
+  /* weak attempt to make the actual colors below this line up */
+  min-height: 80px;
+}
+
 .App {
   padding: 10px;
 }
