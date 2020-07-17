@@ -11,7 +11,7 @@ const COLOR_SETS: ColorSet[] = [
   },
   {
     filename: "css",
-    title: "Css",
+    title: "CSS",
     description: "The named colors defined in the CSS4 spec, available <a href=\"https://www.w3.org/TR/css-color-4/#hex-notation\">here</a>."
   }
 ];
@@ -41,45 +41,19 @@ class App extends React.Component<{}, AppState> {
 
   render() {
     //TODO - separate component to gather color
-    let white = lab('#00aba5');
+    //let white = lab('#00aba5');
+    //let white = lab('#aabb99');
     if (this.state.isFetching || this.state.colorData.size === 0) {
       return <h1>Fetching data...</h1>;
     }
-    let parts : JSX.Element[] = [];
-    COLOR_SETS.map(colorSet => {
-      parts.push(this.getSimilarColorElement(this.state.colorData.get(colorSet.filename)!, white, colorSet));
-    });
     return (
       <div className="App">
         <div>
           <span className="colorBox" title="#00aba5" style={{backgroundColor: "#00aba5"}}></span>#00aba5
         </div>
-        {parts}
+        <SimilarColors colorData={this.state.colorData} targetColor="#00aba5"/>
       </div>
     );
-  }
-
-  getSimilarColorElement(colors: FriendlyColor[], targetColor: LabColor, colorSet: ColorSet) : JSX.Element {
-    let parts : JSX.Element[] = [];
-    parts.push(<h1>{colorSet.title}</h1>);
-    const unsafeDescription = {__html: colorSet.description};
-    parts.push(<p className="colorSetDescription" dangerouslySetInnerHTML={unsafeDescription}></p>);
-    const similarColors = this.getMostSimilarColors(colors, targetColor);
-    for (const similarColor of similarColors) {
-      parts.push(<li key={colorSet.filename + "|" + similarColor[1].name} className="colorLine">
-        <span className="colorBox" title={similarColor[1].cssColor} style={{backgroundColor: similarColor[1].cssColor}}></span>
-        <span>&nbsp;{similarColor[1].name}: {getDisplayDistance(similarColor[0])}</span>
-       </li>);
-    }
-    return <div className="colorSet">{parts}</div>
-  }
-
-  getMostSimilarColors(colors: FriendlyColor[], targetColor: LabColor) : Array<[number, FriendlyColor]> {
-    let distances : Array<[number, FriendlyColor]> =
-      colors.map(friendlyColor => [colorDistance(targetColor, friendlyColor.labColor), friendlyColor]);
-    distances.sort((a, b) => a[0] - b[0]);
-    // TODO - constant for 10 here
-    return distances.slice(0, 10);
   }
 
   componentWillMount() {
@@ -129,6 +103,47 @@ class App extends React.Component<{}, AppState> {
   }
 
   fetchColors = this.fetchColorsAsync;
+}
+
+type SimilarColorsProps = {
+  colorData: Map<string, FriendlyColor[]>,
+  targetColor: string
+};
+
+
+class SimilarColors extends React.Component<SimilarColorsProps> {
+  render() {
+    //TODO validate the string
+    const targetColor = lab(this.props.targetColor);
+    let parts : JSX.Element[] = [];
+    COLOR_SETS.map(colorSet => {
+      parts.push(this.getSimilarColorElement(this.props.colorData.get(colorSet.filename)!, targetColor, colorSet));
+    });
+    return <div>{parts}</div>;
+  }
+
+  getSimilarColorElement(colors: FriendlyColor[], targetColor: LabColor, colorSet: ColorSet) : JSX.Element {
+    let parts : JSX.Element[] = [];
+    parts.push(<h1>{colorSet.title}</h1>);
+    const unsafeDescription = {__html: colorSet.description};
+    parts.push(<p className="colorSetDescription" dangerouslySetInnerHTML={unsafeDescription}></p>);
+    const similarColors = this.getMostSimilarColors(colors, targetColor);
+    for (const similarColor of similarColors) {
+      parts.push(<li key={colorSet.filename + "|" + similarColor[1].name} className="colorLine">
+        <span className="colorBox" title={similarColor[1].cssColor} style={{backgroundColor: similarColor[1].cssColor}}></span>
+        <span>&nbsp;{similarColor[1].name}: {getDisplayDistance(similarColor[0])}</span>
+       </li>);
+    }
+    return <div className="colorSet">{parts}</div>
+  }
+
+  getMostSimilarColors(colors: FriendlyColor[], targetColor: LabColor) : Array<[number, FriendlyColor]> {
+    let distances : Array<[number, FriendlyColor]> =
+      colors.map(friendlyColor => [colorDistance(targetColor, friendlyColor.labColor), friendlyColor]);
+    distances.sort((a, b) => a[0] - b[0]);
+    // TODO - constant for 25 here
+    return distances.slice(0, 25);
+  }
 }
 
 export function getDisplayDistance(distance: number) : string {
