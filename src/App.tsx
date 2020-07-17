@@ -40,11 +40,11 @@ class App extends React.Component<{}, AppState> {
   };
 
   render() {
+    //TODO - separate component to gather color
     let white = lab('#00aba5');
     if (this.state.isFetching || this.state.colorData.size === 0) {
       return <h1>Fetching data...</h1>;
     }
-    // TODO kinda ugly
     let parts : JSX.Element[] = [];
     COLOR_SETS.map(colorSet => {
       parts.push(this.getSimilarColorElement(this.state.colorData.get(colorSet.filename)!, white, colorSet));
