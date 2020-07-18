@@ -179,9 +179,9 @@ class SimilarColors extends React.Component<SimilarColorsProps> {
 
   getSimilarColorElement(colors: FriendlyColor[], targetColor: LabColor, colorSet: ColorSet) : JSX.Element {
     let parts : JSX.Element[] = [];
-    parts.push(<h1>{colorSet.title}</h1>);
+    parts.push(<h1 key="header">{colorSet.title}</h1>);
     const unsafeDescription = {__html: colorSet.description};
-    parts.push(<p className="colorSetDescription" dangerouslySetInnerHTML={unsafeDescription}></p>);
+    parts.push(<p key="description" className="colorSetDescription" dangerouslySetInnerHTML={unsafeDescription}></p>);
     const similarColors = this.getMostSimilarColors(colors, targetColor);
     for (const similarColor of similarColors) {
       parts.push(<li key={colorSet.filename + "|" + similarColor[1].name} className="colorLine">
@@ -189,7 +189,7 @@ class SimilarColors extends React.Component<SimilarColorsProps> {
         <span>&nbsp;{similarColor[1].name}: {getDisplayDistance(similarColor[0])}</span>
        </li>);
     }
-    return <div className="colorSet">{parts}</div>
+    return <div key={colorSet.filename} className="colorSet">{parts}</div>
   }
 
   getMostSimilarColors(colors: FriendlyColor[], targetColor: LabColor) : Array<[number, FriendlyColor]> {
