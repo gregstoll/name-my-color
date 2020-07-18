@@ -66,7 +66,7 @@ class App extends React.Component<{}, AppState> {
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.fetchColors();
   }
 
