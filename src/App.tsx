@@ -1,6 +1,7 @@
 import React, { ChangeEvent } from 'react';
 import colorlab from 'colorlab';
 import { lab, LabColor } from 'd3-color';
+import { SketchPicker, ColorResult } from 'react-color';
 import './App.css';
 
 const COLOR_SETS: ColorSet[] = [
@@ -49,8 +50,10 @@ class App extends React.Component<{}, AppState> {
     }
     return (
       <div className="App">
-        <InputColor colorChange={(color, isValid) => this.handleColorChange(color, isValid)}
-          color={this.state.inputColor} />
+        <InputColor
+          colorChange={(color, isValid) => this.handleColorChange(color, isValid)}
+          color={this.state.inputColor}
+          lastValidColor={this.state.targetColor} />
         <DisplayTargetColor color={this.state.targetColor} />
         <SimilarColors colorData={this.state.colorData} targetColor={this.state.targetColor}/>
       </div>
@@ -116,18 +119,37 @@ class App extends React.Component<{}, AppState> {
 }
 
 type InputColorProps = {
+  lastValidColor: string,
   color: string,
   colorChange: (newColor: string, isValid: boolean) => void
 }
 
-class InputColor extends React.Component<InputColorProps> {
+type InputColorState = {
+  pickerVisible: boolean
+}
+
+class InputColor extends React.Component<InputColorProps, InputColorState> {
+  state: InputColorState = {
+    pickerVisible: false
+  };
+
   render() {
     return <form>
-      <div>
         <label htmlFor="color">Color to name: </label>
         <input type="text" name="color" value={this.props.color} onChange={event => this.handleColorChange(event)}></input>
-      </div>
+        &nbsp;<button type="button" onClick={event => this.handleTogglePicker(event)}>Toggle picker</button>
+        {this.state.pickerVisible && (
+          <SketchPicker color={this.props.lastValidColor} onChangeComplete={(color, event) => this.handlePickerColorChange(color)} /> 
+        )}
     </form>;
+  }
+
+  handleTogglePicker(event: React.FormEvent<HTMLButtonElement>): void {
+    this.setState({pickerVisible: !this.state.pickerVisible});
+  }
+
+  handlePickerColorChange(color: ColorResult): void {
+    this.props.colorChange(color.hex, true);
   }
 
   handleColorChange(event: ChangeEvent<HTMLInputElement>) {
