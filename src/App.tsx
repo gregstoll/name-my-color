@@ -135,13 +135,19 @@ class InputColor extends React.Component<InputColorProps> {
     if (!text.startsWith('#')) {
       text = '#' + text;
     }
-    this.props.colorChange(text, this.colorIsValid(text));
+    this.props.colorChange(text, colorIsValid(text));
   }
+}
 
-  colorIsValid(text: string) : boolean {
-    //TODO - better validation
-    return text.length === 7;
+const ColorRegex = (new RegExp("^[0-9a-fA-F]{6}$"));
+export function colorIsValid(text: string) : boolean {
+  if (!text.startsWith("#")) {
+    return false;
   }
+  if (text.length !== 7) {
+    return false;
+  }
+  return ColorRegex.test(text.substring(1));
 }
 
 type DisplayTargetColorProps = {
