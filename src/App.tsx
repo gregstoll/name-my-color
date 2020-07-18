@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import colorlab from 'colorlab';
 import { lab, LabColor } from 'd3-color';
 import './App.css';
@@ -31,16 +31,19 @@ interface FriendlyColor {
 type AppState = {
   isFetching: boolean,
   colorData: Map<string, FriendlyColor[]>,
+  targetColor: string,
+  inputColor: string
 };
 
 class App extends React.Component<{}, AppState> {
   state: AppState = {
     isFetching: false,
-    colorData: new Map<string, FriendlyColor[]>()
+    colorData: new Map<string, FriendlyColor[]>(),
+    targetColor: "#123456",
+    inputColor: "#123456"
   };
 
   render() {
-    //TODO - separate component to gather color
     //let white = lab('#00aba5');
     //let white = lab('#aabb99');
     if (this.state.isFetching || this.state.colorData.size === 0) {
@@ -48,12 +51,21 @@ class App extends React.Component<{}, AppState> {
     }
     return (
       <div className="App">
-        <div>
-          <span className="colorBox" title="#00aba5" style={{backgroundColor: "#00aba5"}}></span>#00aba5
-        </div>
-        <SimilarColors colorData={this.state.colorData} targetColor="#00aba5"/>
+        <InputColor colorChange={(color, isValid) => this.handleColorChange(color, isValid)}
+          color={this.state.inputColor} />
+        <DisplayTargetColor color={this.state.targetColor} />
+        <SimilarColors colorData={this.state.colorData} targetColor={this.state.targetColor}/>
       </div>
     );
+  }
+
+  handleColorChange(color: string, isValid: boolean): void {
+    if (isValid) {
+      this.setState({targetColor: color, inputColor: color});
+    }
+    else {
+      this.setState({inputColor: color});
+    }
   }
 
   componentWillMount() {
@@ -105,12 +117,51 @@ class App extends React.Component<{}, AppState> {
   fetchColors = this.fetchColorsAsync;
 }
 
+type InputColorProps = {
+  color: string,
+  colorChange: (newColor: string, isValid: boolean) => void
+}
+
+class InputColor extends React.Component<InputColorProps> {
+  render() {
+    return <form>
+      <div>
+        <label htmlFor="color">Color: </label>
+        <input type="text" name="color" value={this.props.color} onChange={event => this.handleColorChange(event)}></input>
+      </div>
+    </form>;
+  }
+
+  handleColorChange(event: ChangeEvent<HTMLInputElement>) {
+    let text = event.target.value.trim();
+    if (!text.startsWith('#')) {
+      text = '#' + text;
+    }
+    this.props.colorChange(text, this.colorIsValid(text));
+  }
+
+  colorIsValid(text: string) : boolean {
+    //TODO - better validation
+    return text.length === 7;
+  }
+}
+
+type DisplayTargetColorProps = {
+  color: string
+}
+class DisplayTargetColor extends React.Component<DisplayTargetColorProps> {
+  render() {
+    return <div>
+      <span className="colorBox" title={this.props.color} style={{backgroundColor: this.props.color}}></span>{this.props.color}
+    </div>;
+  }
+}
+
 type SimilarColorsProps = {
   colorData: Map<string, FriendlyColor[]>,
   targetColor: string,
   numberOfSimilarColors?: number
 };
-
 
 class SimilarColors extends React.Component<SimilarColorsProps> {
   render() {
