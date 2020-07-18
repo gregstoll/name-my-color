@@ -44,8 +44,6 @@ class App extends React.Component<{}, AppState> {
   };
 
   render() {
-    //let white = lab('#00aba5');
-    //let white = lab('#aabb99');
     if (this.state.isFetching || this.state.colorData.size === 0) {
       return <h1>Fetching data...</h1>;
     }
@@ -78,7 +76,7 @@ class App extends React.Component<{}, AppState> {
       const fetchPromises = COLOR_SETS.map(colorSet => this.fetchColorFile(colorSet.filename + "rgb.txt"));
       const fileContents = await Promise.all(fetchPromises);
       let colorData = new Map<string, FriendlyColor[]>();
-      fileContents.map((contents, index) => {
+      fileContents.forEach((contents, index) => {
         colorData.set(COLOR_SETS[index].filename, this.parseData(contents));
       });
       this.setState({...this.state,
@@ -126,7 +124,7 @@ class InputColor extends React.Component<InputColorProps> {
   render() {
     return <form>
       <div>
-        <label htmlFor="color">Color: </label>
+        <label htmlFor="color">Color to name: </label>
         <input type="text" name="color" value={this.props.color} onChange={event => this.handleColorChange(event)}></input>
       </div>
     </form>;
@@ -152,7 +150,7 @@ type DisplayTargetColorProps = {
 class DisplayTargetColor extends React.Component<DisplayTargetColorProps> {
   render() {
     return <div>
-      <span className="colorBox" title={this.props.color} style={{backgroundColor: this.props.color}}></span>{this.props.color}
+      <span className="colorBox" title={this.props.color} style={{backgroundColor: this.props.color}}></span>&nbsp;{this.props.color}
     </div>;
   }
 }
@@ -165,10 +163,9 @@ type SimilarColorsProps = {
 
 class SimilarColors extends React.Component<SimilarColorsProps> {
   render() {
-    //TODO validate the string
     const targetColor = lab(this.props.targetColor);
     let parts : JSX.Element[] = [];
-    COLOR_SETS.map(colorSet => {
+    COLOR_SETS.forEach(colorSet => {
       parts.push(this.getSimilarColorElement(this.props.colorData.get(colorSet.filename)!, targetColor, colorSet));
     });
     return <div>{parts}</div>;
