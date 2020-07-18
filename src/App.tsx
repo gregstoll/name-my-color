@@ -161,7 +161,7 @@ class InputColor extends React.Component<InputColorProps, InputColorState> {
   }
 }
 
-const ColorRegex = (new RegExp("^[0-9a-fA-F]{6}$"));
+const ColorRegex = new RegExp("^[0-9a-fA-F]{6}$");
 export function colorIsValid(text: string) : boolean {
   if (!text.startsWith("#")) {
     return false;
