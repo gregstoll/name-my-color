@@ -33,20 +33,25 @@ type AppState = {
   isFetching: boolean,
   colorData: Map<string, FriendlyColor[]>,
   targetColor: string,
-  inputColor: string
+  inputColor: string,
+  haveUpdatedFromHash: boolean
 };
 
 class App extends React.Component<{}, AppState> {
   state: AppState = {
     isFetching: false,
     colorData: new Map<string, FriendlyColor[]>(),
-    targetColor: "#123456",
-    inputColor: "#123456"
+    targetColor: "#f70022",
+    inputColor: "#f70022",
+    haveUpdatedFromHash: false
   };
 
   render() {
-    if (this.state.isFetching || this.state.colorData.size === 0) {
+    if (!this.dataHasLoaded()) {
       return <h1>Fetching data...</h1>;
+    }
+    if (this.state.haveUpdatedFromHash) {
+      this.updateHash();
     }
     return (
       <div className="App">
@@ -71,6 +76,35 @@ class App extends React.Component<{}, AppState> {
 
   componentDidMount() {
     this.fetchColors();
+    this.updateInitialStateFromHash();
+  }
+  
+  dataHasLoaded() {
+    return !(this.state.isFetching || this.state.colorData.size === 0);
+  }
+
+  componentDidUpdate(prevProps : {}, prevState: AppState, snapshot: {}) {
+    this.updateInitialStateFromHash();
+  }
+
+  updateInitialStateFromHash() {
+    if (this.dataHasLoaded() && !this.state.haveUpdatedFromHash) {
+      this.setStateFromHash();
+    }
+  }
+
+  setStateFromHash() {
+    if (window.location.hash.length > 1) {
+      const hashColor = "#" + window.location.hash.substr(1);
+      if (colorIsValid(hashColor)) {
+        this.setState({inputColor: hashColor, targetColor: hashColor});
+      }
+    }
+    this.setState({haveUpdatedFromHash: true});
+  }
+
+  updateHash() {
+    window.location.hash = this.state.targetColor;
   }
 
   async fetchColorsAsync() {
