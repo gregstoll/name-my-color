@@ -134,11 +134,10 @@ class InputColor extends React.Component<InputColorProps, InputColorState> {
   };
 
   render() {
-    //TODO toggle text
     return <form>
         <label htmlFor="color">Color to name: </label>
         <input type="text" name="color" value={this.props.color} onChange={event => this.handleColorChange(event)}></input>
-        &nbsp;<button type="button" onClick={event => this.handleTogglePicker(event)}>Toggle picker</button>
+        &nbsp;<button type="button" onClick={event => this.handleTogglePicker(event)}>{this.state.pickerVisible ? "Hide" : "Show"} picker</button>
         {this.state.pickerVisible && (
           <SketchPicker color={this.props.lastValidColor} onChangeComplete={(color, event) => this.handlePickerColorChange(color)} /> 
         )}
