@@ -34,7 +34,7 @@ div.colorSet {
   min-height: 80px;
 }
 
-body {
+.mainContainer {
   padding: 10px;
 }
 
