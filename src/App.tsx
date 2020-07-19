@@ -134,6 +134,7 @@ class InputColor extends React.Component<InputColorProps, InputColorState> {
   };
 
   render() {
+    //TODO toggle text
     return <form>
         <label htmlFor="color">Color to name: </label>
         <input type="text" name="color" value={this.props.color} onChange={event => this.handleColorChange(event)}></input>
@@ -206,10 +207,9 @@ class SimilarColors extends React.Component<SimilarColorsProps> {
     parts.push(<p key="description" className="colorSetDescription" dangerouslySetInnerHTML={unsafeDescription}></p>);
     const similarColors = this.getMostSimilarColors(colors, targetColor);
     for (const similarColor of similarColors) {
-      parts.push(<li key={colorSet.filename + "|" + similarColor[1].name} className="colorLine">
-        <span className="colorBox" title={similarColor[1].cssColor} style={{backgroundColor: similarColor[1].cssColor}}></span>
-        <span>&nbsp;{similarColor[1].name}: {getDisplayDistance(similarColor[0])}</span>
-       </li>);
+      parts.push(<SimilarColor key={colorSet.filename + "|" + similarColor[1].name}
+        color={similarColor[1]}
+        distance={similarColor[0]} />);
     }
     return <div key={colorSet.filename} className="colorSet">{parts}</div>
   }
@@ -219,6 +219,35 @@ class SimilarColors extends React.Component<SimilarColorsProps> {
       colors.map(friendlyColor => [colorDistance(targetColor, friendlyColor.labColor), friendlyColor]);
     distances.sort((a, b) => a[0] - b[0]);
     return distances.slice(0, this.props.numberOfSimilarColors ?? 25);
+  }
+}
+
+type SimilarColorProps = {
+  color: FriendlyColor,
+  distance: number
+};
+type SimilarColorState = {
+  expanded: boolean
+};
+class SimilarColor extends React.Component<SimilarColorProps, SimilarColorState> {
+  state: SimilarColorState = {
+    expanded: false 
+  };
+
+  render() {
+    const color = this.props.color;
+    return <li onClick={event => this.handleClick(event)}>
+      <p className="colorLine">
+      <span className="colorBox" title={color.cssColor} style={{backgroundColor: color.cssColor}}></span>
+      <span>&nbsp;{color.name}: {getDisplayDistance(this.props.distance)}</span>
+      </p>
+      { this.state.expanded && (
+          <p className="colorSpecification">{color.cssColor}</p>
+      )}
+    </li>;
+  }
+  handleClick(event: React.MouseEvent<HTMLLIElement, MouseEvent>): void {
+    this.setState({expanded: !this.state.expanded});
   }
 }
 

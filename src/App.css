@@ -16,11 +16,17 @@ div.colorSet {
   float: left;
 }
 
-li.colorLine {
+.colorLine {
   display: flex;
   align-items: center;
   margin-top: 5px;
   margin-bottom: 5px;
+}
+
+.colorSpecification {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 5px;
 }
 
 .colorSetDescription {
