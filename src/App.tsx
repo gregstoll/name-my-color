@@ -14,7 +14,13 @@ const COLOR_SETS: ColorSet[] = [
     filename: "css",
     title: "CSS",
     description: "The named colors defined in the CSS4 spec, available <a href=\"https://www.w3.org/TR/css-color-4/#hex-notation\">here</a>."
+  },
+  {
+    filename: "meodai",
+    title: "Meodia Color Names",
+    description: "A large set of handpicked color names available <a href=\"https://github.com/meodai/color-names\">on GitHub</a>. This uses only the \"good\" color names from the list."
   }
+
 ];
 
 interface ColorSet {
