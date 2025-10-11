@@ -275,8 +275,8 @@ class SimilarColor extends React.Component<SimilarColorProps, SimilarColorState>
 
   render() {
     const color = this.props.color;
-    return <li onClick={event => this.handleClick(event)}>
-      <p className="colorLine">
+    return <li>
+      <p className="colorLine" onClick={event => this.handleClick(event)}>
       <span className="colorBox" title={color.cssColor} style={{backgroundColor: color.cssColor}}></span>
       <span>&nbsp;{color.name}: {getDisplayDistance(this.props.distance)}</span>
       </p>
@@ -285,7 +285,7 @@ class SimilarColor extends React.Component<SimilarColorProps, SimilarColorState>
       )}
     </li>;
   }
-  handleClick(event: React.MouseEvent<HTMLLIElement, MouseEvent>): void {
+  handleClick(event: React.MouseEvent<HTMLParagraphElement, MouseEvent>): void {
     this.setState({expanded: !this.state.expanded});
   }
 }
