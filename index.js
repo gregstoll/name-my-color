@@ -11,6 +11,25 @@ const lab1 = new CIELAB(x.l, x.a, x.b);
 const lab2 = new CIELAB(y.l, y.a, y.b);
 console.log(CIEDE2000(lab1, lab2));*/
 
+const COLOR_SETS = [
+  {
+    filename: "xkcd",
+    title: "Xkcd",
+    description: "The popular <a href=\"https://xkcd.com\">xkcd</a> webcomic did a project to crowdsource common color names; you can see the results <a href=\"https://xkcd.com/color/rgb/\">here</a>."
+  },
+  {
+    filename: "css",
+    title: "CSS",
+    description: "The named colors defined in the CSS4 spec, available <a href=\"https://www.w3.org/TR/css-color-4/#hex-notation\">here</a>."
+  },
+  {
+    filename: "meodai",
+    title: "Meodia Color Names",
+    description: "A large set of handpicked color names available <a href=\"https://github.com/meodai/color-names\">on GitHub</a>. This uses only the \"good\" color names from the list."
+  }
+];
+
+
 const ColorRegex = new RegExp("^[0-9a-fA-F]{6}$");
 /**
  * 
@@ -115,7 +134,29 @@ class DisplayTargetColor extends HTMLElement {
 customElements.define('display-target-color', DisplayTargetColor);
 
 class ColorSet extends HTMLElement {
-
+    #colorSetInfo;
+    constructor(colorSetInfo) {
+        super();
+        this.#colorSetInfo = colorSetInfo;
+        this.attachShadow({ mode: 'open' });
+    }
+    connectedCallback() {
+        if (this.shadowRoot.childNodes.length) return;
+        this.shadowRoot.innerHTML = `
+            <link rel="stylesheet" href="index.css">
+            <div class="colorSet">
+                <h1 id="header"></h1>
+                <p class="colorSetDescription"></p>
+            </div>
+        `;
+        this.update();
+    }
+    update() {
+        if (!this.shadowRoot.childNodes.length) return;
+        this.shadowRoot.getElementById("header").innerText = this.#colorSetInfo.title;
+        // dangerous!
+        this.shadowRoot.querySelector(".colorSetDescription").innerHTML = this.#colorSetInfo.description;
+    }
 }
 customElements.define('color-set', ColorSet);
 
@@ -123,10 +164,17 @@ class NameMyColorApp extends HTMLElement {
     // TODO parse query hash
     #inputColor = "#f70022";
     #targetColor = "#f70022";
+    #colorSets = new Set();
     connectedCallback() {
         if (this.inputColorElement) return;
         this.innerHTML = `<input-color></input-color><display-target-color>
-            </display-target-color>`;
+            </display-target-color>
+            <div id="similarColors></div>`;
+        for (const colorSetInfo of COLOR_SETS) {
+            let colorSet = new ColorSet(colorSetInfo);
+            this.#colorSets.add(colorSetInfo.filename, colorSet);
+            this.appendChild(colorSet);
+        }
         this.inputColorElement.addEventListener("colorChange", e => {
             // TODO update query hash?
             this.#inputColor = e.detail.color;
