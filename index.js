@@ -135,6 +135,7 @@ customElements.define('display-target-color', DisplayTargetColor);
 
 class ColorSet extends HTMLElement {
     #colorSetInfo;
+    #colorData;
     constructor(colorSetInfo) {
         super();
         this.#colorSetInfo = colorSetInfo;
@@ -147,6 +148,7 @@ class ColorSet extends HTMLElement {
             <div class="colorSet">
                 <h1 id="header"></h1>
                 <p class="colorSetDescription"></p>
+                <div id="similarColors"></div>
             </div>
         `;
         this.update();
@@ -156,6 +158,19 @@ class ColorSet extends HTMLElement {
         this.shadowRoot.getElementById("header").innerText = this.#colorSetInfo.title;
         // dangerous!
         this.shadowRoot.querySelector(".colorSetDescription").innerHTML = this.#colorSetInfo.description;
+        let similarColorsList = this.shadowRoot.getElementById("similarColors");
+        let children = [];
+        for (let data of this.#colorData) {
+            // TODO make a real node
+            let node = document.createElement('div');
+            node.innerText = data.name;
+            children.push(node);
+        }
+        similarColorsList.replaceChildren(...children);
+    }
+    set colorData(val) {
+        this.#colorData = val;
+        this.update();
     }
 }
 customElements.define('color-set', ColorSet);
@@ -164,15 +179,23 @@ class NameMyColorApp extends HTMLElement {
     // TODO parse query hash
     #inputColor = "#f70022";
     #targetColor = "#f70022";
-    #colorSets = new Set();
+    #isFetching = false;
+    #colorSets = new Map();
     connectedCallback() {
-        if (this.inputColorElement) return;
+        if (this.inputColorElement || this.#isFetching) return;
+        for (const colorSetInfo of COLOR_SETS) {
+            let colorSet = new ColorSet(colorSetInfo);
+            this.#colorSets.set(colorSetInfo.filename, colorSet);
+        }
+        this.innerHTML = `<h1>Fetching data...</h1>`;
+        this.fetchColorsAsync();
+    }
+    gotColors() {
         this.innerHTML = `<input-color></input-color><display-target-color>
             </display-target-color>
             <div id="similarColors></div>`;
         for (const colorSetInfo of COLOR_SETS) {
-            let colorSet = new ColorSet(colorSetInfo);
-            this.#colorSets.add(colorSetInfo.filename, colorSet);
+            let colorSet = this.#colorSets.get(colorSetInfo.filename);
             this.appendChild(colorSet);
         }
         this.inputColorElement.addEventListener("colorChange", e => {
@@ -193,6 +216,47 @@ class NameMyColorApp extends HTMLElement {
         this.inputColorElement.setAttribute("color", this.#inputColor);
         this.inputColorElement.setAttribute("lastvalidcolor", this.#targetColor);
         this.querySelector("display-target-color").setAttribute("color", this.#targetColor);
+    }
+
+    async fetchColorsAsync() {
+        try {
+            this.#isFetching = true;
+            const fetchPromises = COLOR_SETS.map(colorSet => this.fetchColorFile(colorSet.filename + "rgb.txt"));
+            const fileContents = await Promise.all(fetchPromises);
+            let colorData = new Map();
+            fileContents.forEach((contents, index) => {
+                let colorSet = this.#colorSets.get(COLOR_SETS[index].filename);
+                colorSet.colorData = this.parseData(contents);
+            });
+            this.#isFetching = false;
+            this.gotColors();
+        }
+        catch (e) {
+            // TODO something better?
+            console.log(e);
+        }
+    }
+
+    async fetchColorFile(fileName) {
+        const response = await fetch("data/" + fileName);
+        const data = await response.text();
+        return data;
+    }
+
+    parseData(str) {
+        const lines = str.split("\n");
+        let colors = [];
+        for (let line of lines) {
+            line = line.trim();
+            if (line.length === 0 || line.startsWith('#')) {
+                continue;
+            }
+            const hashIndex = line.lastIndexOf("#");
+            const name = line.substring(0, hashIndex).trim();
+            const value = line.substring(hashIndex).trim();
+            colors.push({name: name, cssColor: value, labColor: lab(value)});
+        }
+        return colors;
     }
 }
 customElements.define('name-my-color-app', NameMyColorApp);
