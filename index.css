@@ -1,0 +1,39 @@
+span.colorBox {
+  display: inline-block;
+  width: 60px;
+  height: 20px;
+}
+
+div.colorSet {
+  border-color: gray;
+  border-radius: 10px;
+  border-width: 3px;
+  border-style: solid;
+  padding: 5px;
+  margin: 5px;
+  list-style: none;
+  width: 400px;
+  float: left;
+}
+
+.colorLine {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.colorSpecification {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 5px;
+}
+
+.colorSetDescription {
+  /* weak attempt to make the actual colors below this line up */
+  min-height: 80px;
+}
+
+.mainContainer {
+  padding: 10px;
+}

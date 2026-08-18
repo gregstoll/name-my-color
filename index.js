@@ -27,14 +27,14 @@ export function colorIsValid(text) {
   return ColorRegex.test(text.substring(1));
 }
 
-class TargetColor extends HTMLElement {
+class InputColor extends HTMLElement {
     /** @type string */
     #color;
     /** @type string */
     #lastValidColor;
 
     static get observedAttributes() {
-        return ['color'];
+        return ['color', 'lastvalidcolor'];
     }
     attributeChangedCallback(_name, _oldValue, _newValue) {
         this.update();
@@ -65,13 +65,13 @@ class TargetColor extends HTMLElement {
     update() {
         if (!this.querySelector('form')) return;
         let newColor = this.getAttribute("color");
-        // TODO - handle lastValidColor
+        let newLastValidColor = this.getAttribute("lastvalidcolor");
         // TODO - show color (lastValidColor?) in text
-        if (this.#color !== newColor) {
+        if (this.#color !== newColor || this.#lastValidColor !== newLastValidColor) {
             this.#color = newColor;
-            this.#lastValidColor = newColor;
+            this.#lastValidColor = newLastValidColor;
             this.textElement.value = this.#color;
-            this.colorElement.value = this.#color;
+            this.colorElement.value = this.#lastValidColor;
         }
     }
 
@@ -85,7 +85,34 @@ class TargetColor extends HTMLElement {
         }));
     }
 }
-customElements.define('target-color', TargetColor);
+customElements.define('input-color', InputColor);
+
+class DisplayTargetColor extends HTMLElement {
+    connectedCallback() {
+        if (this.querySelector('div')) return;
+        this.innerHTML = `
+            <div>
+                <span class="colorBox"></span>&nbsp;<span id="colorText"></span>
+            </div>`;
+        this.update();
+    }
+    static get observedAttributes() {
+        return ['color'];
+    }
+    attributeChangedCallback(_name, _oldValue, _newValue) {
+        this.update();
+    }
+    update() {
+        if (!this.querySelector('div')) return;
+        let color = this.getAttribute('color');
+        let colorBox = this.querySelector(".colorBox");
+        colorBox.setAttribute('title', color);
+        colorBox.style.backgroundColor = color;
+        let colorText = this.querySelector("#colorText");
+        colorText.innerText = color;
+    }
+}
+customElements.define('display-target-color', DisplayTargetColor);
 
 class ColorSet extends HTMLElement {
 
@@ -93,23 +120,31 @@ class ColorSet extends HTMLElement {
 customElements.define('color-set', ColorSet);
 
 class NameMyColorApp extends HTMLElement {
-    #color = "#f70022";
+    // TODO parse query hash
+    #inputColor = "#f70022";
+    #targetColor = "#f70022";
     connectedCallback() {
-        if (this.querySelector("target-color")) return;
-        this.innerHTML = `<target-color></target-color>`;
-        this.targetColor.addEventListener("colorChange", e => {
+        if (this.inputColorElement) return;
+        this.innerHTML = `<input-color></input-color><display-target-color>
+            </display-target-color>`;
+        this.inputColorElement.addEventListener("colorChange", e => {
+            // TODO update query hash?
+            this.#inputColor = e.detail.color;
             if (e.detail.colorIsValid) {
-                this.#color = e.detail.color;
-                this.update();
+                this.#targetColor = e.detail.color;
             }
+            this.update();
         });
         this.update();
     }
-    get targetColor() {
-        return this.querySelector("target-color");
+    get inputColorElement() {
+        return this.querySelector("input-color");
     }
     update() {
-        this.targetColor.setAttribute("color", this.#color);
+        if (!this.inputColorElement) return;
+        this.inputColorElement.setAttribute("color", this.#inputColor);
+        this.inputColorElement.setAttribute("lastvalidcolor", this.#targetColor);
+        this.querySelector("display-target-color").setAttribute("color", this.#targetColor);
     }
 }
 customElements.define('name-my-color-app', NameMyColorApp);
