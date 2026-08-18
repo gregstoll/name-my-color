@@ -133,9 +133,37 @@ class DisplayTargetColor extends HTMLElement {
 }
 customElements.define('display-target-color', DisplayTargetColor);
 
+class SimilarColor extends HTMLElement {
+    #expanded = false;
+    #friendlyColor;
+    #distance;
+    constructor(friendlyColor, distance) {
+        super();
+        this.#friendlyColor = friendlyColor;
+        this.#distance = distance;
+    }
+    connectedCallback() {
+        if (this.childNodes.length) return;
+        // TODO expanded
+        this.innerHTML = `
+            <li>
+            <p class="colorLine">
+            <span class="colorBox" title=${this.#friendlyColor.cssColor} style="background-color: ${this.#friendlyColor.cssColor}"></span>
+            <span>&nbsp;${this.#friendlyColor.name}: ${this.getDisplayDistance(this.#distance)}</span>
+            </p>
+            </li>`;
+    }
+
+    getDisplayDistance(distance) {
+        return (Math.round(distance * 100) / 100).toFixed(2);
+    }
+}
+customElements.define('similar-color', SimilarColor);
+
 class ColorSet extends HTMLElement {
     #colorSetInfo;
     #colorData;
+    #targetColor;
     constructor(colorSetInfo) {
         super();
         this.#colorSetInfo = colorSetInfo;
@@ -154,23 +182,38 @@ class ColorSet extends HTMLElement {
         this.update();
     }
     update() {
-        if (!this.shadowRoot.childNodes.length) return;
+        if (!this.shadowRoot.childNodes.length || !this.#targetColor) return;
         this.shadowRoot.getElementById("header").innerText = this.#colorSetInfo.title;
         // dangerous!
         this.shadowRoot.querySelector(".colorSetDescription").innerHTML = this.#colorSetInfo.description;
         let similarColorsList = this.shadowRoot.getElementById("similarColors");
         let children = [];
-        for (let data of this.#colorData) {
-            // TODO make a real node
-            let node = document.createElement('div');
-            node.innerText = data.name;
-            children.push(node);
+        let similarColors = this.getMostSimilarColors(this.#colorData, this.#targetColor);
+        for (let similarColor of similarColors) {
+            children.push(new SimilarColor(similarColor[1], similarColor[0]));
         }
         similarColorsList.replaceChildren(...children);
     }
     set colorData(val) {
         this.#colorData = val;
         this.update();
+    }
+    set targetColor(val) {
+        this.#targetColor = val;
+        this.update();
+    }
+
+    getMostSimilarColors(colors, targetColor) {
+        let distances =
+            colors.map(friendlyColor => [this.colorDistance(targetColor, friendlyColor.labColor), friendlyColor]);
+        distances.sort((a, b) => a[0] - b[0]);
+        return distances.slice(0, 25);
+    }
+
+    colorDistance(x, y) {
+        const lab1 = new CIELAB(x.l, x.a, x.b);
+        const lab2 = new CIELAB(y.l, y.a, y.b);
+        return CIEDE2000(lab1, lab2);
     }
 }
 customElements.define('color-set', ColorSet);
@@ -196,6 +239,7 @@ class NameMyColorApp extends HTMLElement {
             <div id="similarColors></div>`;
         for (const colorSetInfo of COLOR_SETS) {
             let colorSet = this.#colorSets.get(colorSetInfo.filename);
+            colorSet.targetColor = lab(this.#targetColor);
             this.appendChild(colorSet);
         }
         this.inputColorElement.addEventListener("colorChange", e => {
@@ -216,6 +260,9 @@ class NameMyColorApp extends HTMLElement {
         this.inputColorElement.setAttribute("color", this.#inputColor);
         this.inputColorElement.setAttribute("lastvalidcolor", this.#targetColor);
         this.querySelector("display-target-color").setAttribute("color", this.#targetColor);
+        for (const colorSetInfo of COLOR_SETS) {
+            this.#colorSets.get(colorSetInfo.filename).targetColor = lab(this.#targetColor);
+        }
     }
 
     async fetchColorsAsync() {
