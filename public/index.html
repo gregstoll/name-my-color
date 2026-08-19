@@ -1,19 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" color-mode="light">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="canonical" href="https://gregstoll.com/namemycolor" />
-    <ssihead />
     <title>Name My Color</title>
+    <style>
+        div.container {
+          /*max-width: 800px;*/
+        }
+
+#about {
+  align-self: flex-start;
+  max-width: 800px;
+}
+
+    </style>
+    <link rel="stylesheet" href="index.css">
+    <!--#include virtual="/bootstraphead.html"-->
   </head>
   <body>
-    <ssibodytop />
+    <!--#include virtual="/navbar.html"-->
     <p><a href="https://github.com/gregstoll/name-my-color"><img style="position:absolute;top:0;right:0;border:0" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_green_007200.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a></p>
     <div class="container mainContainer">
       <h1>Name My Color</h1>
-      <!-- <p><a href="#about">About this project</a></p> -->
+      <p><a href="#about">About this project</a></p>
+      <script type="module" src="index.js"></script>
       <div id="root"></div>
+      <name-my-color-app></name-my-color-app>
       <h2 id="about" style="clear: both;">About this project</h2>
       <div style="max-width: 50em">
         <p>This is a utility to find a name for a color.  It uses the
@@ -22,7 +36,7 @@
         roughly on a scale from 0-100.</a></p>
         <p>You can hover over a color box or click to see the exact color value of a named color.</p>
       </div>
-      <ssibodybottom />
+    <!--#include virtual="/endOfBody.html"-->
     </div>
   </body>
 </html>
