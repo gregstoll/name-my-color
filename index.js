@@ -219,13 +219,21 @@ class ColorSet extends HTMLElement {
 customElements.define('color-set', ColorSet);
 
 class NameMyColorApp extends HTMLElement {
-    // TODO parse query hash
     #inputColor = "#f70022";
     #targetColor = "#f70022";
     #isFetching = false;
     #colorSets = new Map();
     connectedCallback() {
         if (this.inputColorElement || this.#isFetching) return;
+
+        if (window.location.hash.length > 1) {
+            const hashColor = "#" + window.location.hash.substr(1);
+            if (colorIsValid(hashColor)) {
+                this.#inputColor = hashColor;
+                this.#targetColor = hashColor;
+            }
+        }
+
         for (const colorSetInfo of COLOR_SETS) {
             let colorSet = new ColorSet(colorSetInfo);
             this.#colorSets.set(colorSetInfo.filename, colorSet);
@@ -243,7 +251,6 @@ class NameMyColorApp extends HTMLElement {
             this.appendChild(colorSet);
         }
         this.inputColorElement.addEventListener("colorChange", e => {
-            // TODO update query hash?
             this.#inputColor = e.detail.color;
             if (e.detail.colorIsValid) {
                 this.#targetColor = e.detail.color;
@@ -259,6 +266,7 @@ class NameMyColorApp extends HTMLElement {
         if (!this.inputColorElement) return;
         this.inputColorElement.setAttribute("color", this.#inputColor);
         this.inputColorElement.setAttribute("lastvalidcolor", this.#targetColor);
+        window.location.hash = this.#targetColor;
         this.querySelector("display-target-color").setAttribute("color", this.#targetColor);
         for (const colorSetInfo of COLOR_SETS) {
             this.#colorSets.get(colorSetInfo.filename).targetColor = lab(this.#targetColor);
