@@ -17,13 +17,16 @@ color-set {
 }
 
 details.colorLine {
-  /*display: flex;*/
   align-items: center;
   margin-top: 5px;
   margin-bottom: 5px;
 }
-details.colorLine summary::marker, :is(::webkit-details-marker) {
+details.colorLine summary::marker {
   content: ""
+}
+/* This doesn't work on Safari :-( */
+details summary::-webkit-details-marker {
+  display: none;
 }
 
 .colorSpecification {
