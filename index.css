@@ -4,7 +4,7 @@ span.colorBox {
   height: 20px;
 }
 
-div.colorSet {
+color-set {
   border-color: gray;
   border-radius: 10px;
   border-width: 3px;
@@ -16,11 +16,14 @@ div.colorSet {
   float: left;
 }
 
-.colorLine {
-  display: flex;
+details.colorLine {
+  /*display: flex;*/
   align-items: center;
   margin-top: 5px;
   margin-bottom: 5px;
+}
+details.colorLine summary::marker, :is(::webkit-details-marker) {
+  content: ""
 }
 
 .colorSpecification {

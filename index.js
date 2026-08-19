@@ -85,7 +85,6 @@ class InputColor extends HTMLElement {
         if (!this.querySelector('form')) return;
         let newColor = this.getAttribute("color");
         let newLastValidColor = this.getAttribute("lastvalidcolor");
-        // TODO - show color (lastValidColor?) in text
         if (this.#color !== newColor || this.#lastValidColor !== newLastValidColor) {
             this.#color = newColor;
             this.#lastValidColor = newLastValidColor;
@@ -144,13 +143,14 @@ class SimilarColor extends HTMLElement {
     }
     connectedCallback() {
         if (this.childNodes.length) return;
-        // TODO expanded
+        // TODO test styling on Safari
         this.innerHTML = `
             <li>
-            <p class="colorLine">
-            <span class="colorBox" title=${this.#friendlyColor.cssColor} style="background-color: ${this.#friendlyColor.cssColor}"></span>
-            <span>&nbsp;${this.#friendlyColor.name}: ${this.getDisplayDistance(this.#distance)}</span>
-            </p>
+            <details class="colorLine">
+                <summary><span class="colorBox" title=${this.#friendlyColor.cssColor} style="background-color: ${this.#friendlyColor.cssColor}"></span>
+                    <span>&nbsp;${this.#friendlyColor.name}: ${this.getDisplayDistance(this.#distance)}</span></summary>
+                <p class="colorSpecification">${this.#friendlyColor.cssColor}</p>
+            </details>
             </li>`;
     }
 
