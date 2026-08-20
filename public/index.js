@@ -4,13 +4,6 @@ import colorlab from "https://cdn.jsdelivr.net/npm/colorlab@0.2/+esm";
 const { CIELAB, CIEDE2000 } = colorlab.default ?? colorlab;
 import {lab} from "https://cdn.jsdelivr.net/npm/d3-color@3/+esm";
 
-/*let x = lab("#f70022");
-let y = lab("#f7022a");
-
-const lab1 = new CIELAB(x.l, x.a, x.b);
-const lab2 = new CIELAB(y.l, y.a, y.b);
-console.log(CIEDE2000(lab1, lab2));*/
-
 const COLOR_SETS = [
   {
     filename: "xkcd",
@@ -44,6 +37,16 @@ export function colorIsValid(text) {
     return false;
   }
   return ColorRegex.test(text.substring(1));
+}
+
+export function colorDistance(x, y) {
+    const lab1 = new CIELAB(x.l, x.a, x.b);
+    const lab2 = new CIELAB(y.l, y.a, y.b);
+    return CIEDE2000(lab1, lab2);
+}
+
+export function getDisplayDistance(distance) {
+    return (Math.round(distance * 100) / 100).toFixed(2);
 }
 
 class InputColor extends HTMLElement {
@@ -153,10 +156,6 @@ class SimilarColor extends HTMLElement {
             </details>
             </li>`;
     }
-
-    getDisplayDistance(distance) {
-        return (Math.round(distance * 100) / 100).toFixed(2);
-    }
 }
 customElements.define('similar-color', SimilarColor);
 
@@ -208,12 +207,6 @@ class ColorSet extends HTMLElement {
             colors.map(friendlyColor => [this.colorDistance(targetColor, friendlyColor.labColor), friendlyColor]);
         distances.sort((a, b) => a[0] - b[0]);
         return distances.slice(0, 25);
-    }
-
-    colorDistance(x, y) {
-        const lab1 = new CIELAB(x.l, x.a, x.b);
-        const lab2 = new CIELAB(y.l, y.a, y.b);
-        return CIEDE2000(lab1, lab2);
     }
 }
 customElements.define('color-set', ColorSet);

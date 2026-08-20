@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Name My Color - Tests</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+    <link rel="stylesheet" href="https://unpkg.com/mocha/mocha.css">
+</head>
+<body>
+    <div id="mocha"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mocha@11.8.0/mocha.js"></script>
+    <script type="module">
+import * as src from '../index.js';
+import * as chai from 'https://cdn.jsdelivr.net/npm/chai@5/+esm';
+const { expect } = chai;
+import colorlab from "https://cdn.jsdelivr.net/npm/colorlab@0.2/+esm";
+const { CIELAB, CIEDE2000 } = colorlab.default ?? colorlab;
+import {lab} from "https://cdn.jsdelivr.net/npm/d3-color@3/+esm";
+
+mocha.setup("bdd");
+
+describe("colorDistance", function() {
+    it('colorDistance is 0 for identical colors', () => 
+    {
+        const color1 = lab('#123456');
+        const color2 = lab('#123456');
+        expect(src.colorDistance(color1, color2)).to.equal(0);
+    });
+
+    it('colorDistance is 100 for white and black', () => 
+    {
+        const white = lab('#ffffff');
+        const black = lab('#000000');
+        expect(src.colorDistance(white, black)).to.equal(100);
+    });
+});
+
+describe("getDisplayDistance", function() {
+    it('getDisplayDistance of 0', () => 
+    {
+        expect(src.getDisplayDistance(0)).to.equal("0.00");
+    });
+
+    it('getDisplayDistance of 0.5', () => 
+    {
+        expect(src.getDisplayDistance(0.5)).to.equal("0.50");
+    });
+
+    it('getDisplayDistance of 2.544', () => 
+    {
+        expect(src.getDisplayDistance(2.544)).to.equal("2.54");
+    });
+
+    it('getDisplayDistance of 2.546', () => 
+    {
+        expect(src.getDisplayDistance(2.546)).to.equal("2.55");
+    });
+});
+
+describe("colorIsValid", function() {
+    it('colorIsValid of #000000', () =>
+    {
+        expect(src.colorIsValid("#000000")).to.equal(true);
+    });
+
+    it('colorIsValid of #0000000', () =>
+    {
+        expect(src.colorIsValid("#0000000")).to.equal(false);
+    });
+
+    it('colorIsValid of #00000', () =>
+    {
+        expect(src.colorIsValid("#00000")).to.equal(false);
+    });
+
+    it('colorIsValid of #afafaf', () =>
+    {
+        expect(src.colorIsValid("#afafaf")).to.equal(true);
+    });
+
+    it('colorIsValid of #AFAFAF', () =>
+    {
+        expect(src.colorIsValid("#AFAFAF")).to.equal(true);
+    });
+
+    it('colorIsValid of #agagag', () =>
+    {
+        expect(src.colorIsValid("#agagag")).to.equal(false);
+    });
+
+    it('colorIsValid of #000', () =>
+    {
+        expect(src.colorIsValid("#000")).to.equal(false);
+    });
+
+    it('colorIsValid of #azazaz', () =>
+    {
+        expect(src.colorIsValid("#azazaz")).to.equal(false);
+    });
+
+    it('colorIsValid of #89abcd', () =>
+    {
+        expect(src.colorIsValid("#89abcd")).to.equal(true);
+    });
+});
+
+mocha.run();
+</script>
+
+</body>
+</html>
