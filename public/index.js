@@ -151,7 +151,7 @@ class SimilarColor extends HTMLElement {
             <li>
             <details class="colorLine">
                 <summary><span class="colorBox" title=${this.#friendlyColor.cssColor} style="background-color: ${this.#friendlyColor.cssColor}"></span>
-                    <span>&nbsp;${this.#friendlyColor.name}: ${this.getDisplayDistance(this.#distance)}</span></summary>
+                    <span>&nbsp;${this.#friendlyColor.name}: ${getDisplayDistance(this.#distance)}</span></summary>
                 <p class="colorSpecification">${this.#friendlyColor.cssColor}</p>
             </details>
             </li>`;
@@ -204,7 +204,7 @@ class ColorSet extends HTMLElement {
 
     getMostSimilarColors(colors, targetColor) {
         let distances =
-            colors.map(friendlyColor => [this.colorDistance(targetColor, friendlyColor.labColor), friendlyColor]);
+            colors.map(friendlyColor => [colorDistance(targetColor, friendlyColor.labColor), friendlyColor]);
         distances.sort((a, b) => a[0] - b[0]);
         return distances.slice(0, 25);
     }
