@@ -146,7 +146,6 @@ class SimilarColor extends HTMLElement {
     }
     connectedCallback() {
         if (this.childNodes.length) return;
-        // TODO test styling on Safari
         this.innerHTML = `
             <li>
             <details class="colorLine">
